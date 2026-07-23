@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- FIX: Added maximum-scale=1 to prevent auto-zooming on mobile inputs -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Travel Agent</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,12 +62,15 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             overflow: hidden;
+            /* FIX: Prevents elastic bouncing on mobile */
+            overscroll-behavior: none; 
             transition: background-color 0.3s, color 0.3s;
         }
 
         .app-container {
             display: flex;
-            height: 100vh;
+            height: 100vh; /* Fallback for older browsers */
+            height: 100dvh; /* FIX: Dynamic viewport height keeps input above mobile navigation bar */
             width: 100vw;
         }
 
@@ -306,7 +310,7 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -387,7 +391,9 @@
 
         /* --- Input Area --- */
         .input-wrapper {
-            padding: 0 24px 24px;
+            padding: 0 16px 16px; 
+            /* FIX: Safe area for iPhones to avoid overlapping with bottom swipe bar */
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
@@ -820,7 +826,7 @@
                 const loadingId = appendLoadingBubble();
 
                 try {
-                    // FIXED: Relative path ensures it works on Localhost, Mobile, and Railway
+                    // Relative path ensures it works on Localhost, Mobile, and Railway
                     const response = await fetch('/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -871,7 +877,6 @@
                 row.className = 'message-row bot-row';
                 const formattedText = typeof marked !== 'undefined' ? marked.parse(text) : text;
                 
-                // FA-ROBOT icon permanently added
                 row.innerHTML = `
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="message-bubble">
@@ -893,7 +898,6 @@
                 row.className = 'message-row bot-row';
                 row.id = id;
                 
-                // FA-ROBOT icon permanently added
                 row.innerHTML = `
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="message-bubble">
