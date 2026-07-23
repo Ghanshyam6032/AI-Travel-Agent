@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 from langchain_core.tools import tool
-from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 
 # Load environment variables
@@ -93,8 +93,14 @@ app.add_middleware(
 # Mount static folder for CSS/JS/Assets (Serves your HTML Frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ✨ SHIFTED TO LLAMA 3.1 8B INSTANT ✨
-llm = init_chat_model(model="llama-3.1-8b-instant", model_provider="groq", temperature=0)
+# ✨ SHIFTED TO OPENROUTER (FREE HIGH LIMITS) ✨
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+llm = ChatOpenAI(
+    model="meta-llama/llama-3.1-8b-instruct:free",
+    api_key=openrouter_api_key,
+    base_url="https://openrouter.ai/api/v1",
+    temperature=0
+)
 
 tools = [weather, flight_search, hotel_search, currency_converter]
 system_prompt = (
