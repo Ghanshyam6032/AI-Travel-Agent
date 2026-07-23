@@ -5,8 +5,6 @@ import urllib.parse
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 from langchain_core.tools import tool
@@ -158,17 +156,16 @@ def distance_calculator(origin: str, destination: str) -> str:
 # ---------------------------------------------------------
 app = FastAPI(title="AI Travel Agent API", version="1.0")
 
+# CORS setup taaki GitHub Pages se requests allow ho sakein
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],  # Production me aap yahan apna GitHub Pages URL dal sakte hain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-llm = init_chat_model(model="llama-3.1-8b-instant", model_provider="groq", temperature=0)
+llm = init_chat_model(model="llama-3.3-70b-versatile", model_provider="groq", temperature=0)
 
 tools = [weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator]
 
@@ -176,9 +173,9 @@ system_prompt = (
     "You are an Elite Travel Concierge.\n\n"
     "CRITICAL RULES:\n"
     "1. Always use tools to fetch real data.\n"
-    "2. NEVER invent or hallucinate tools. ONLY use the exact tools provided to you (weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator).\n"
-    "3. FORMATTING IS CRITICAL: For list results (Hotels, Restaurants, Flights), ALWAYS display each item on a NEW LINE with a bullet point (-).\n"
-    "4. Never dump multiple entries into a single continuous line or paragraph.\n"
+    "2. PAY EXPLICIT ATTENTION TO THE USER'S REQUESTED CITY/LOCATION. If the user asks for weather, hotels, or restaurants in a specific city (e.g., Dubai), you MUST pass that exact city name into the tool arguments. Never substitute it with another city.\n"
+    "3. NEVER invent or hallucinate tools. ONLY use the exact tools provided to you (weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator).\n"
+    "4. FORMATTING IS CRITICAL: For list results (Hotels, Restaurants, Flights), ALWAYS display each item on a NEW LINE with a bullet point (-).\n"
     "5. The tools will provide you with clickable markdown links (e.g. [Hotel Name](URL)). You MUST preserve these links in your final output exactly as provided so the user can click them.\n\n"
     "Headers to use ONLY when requested:\n"
     "### 🗺️ Travel Distance & Time\n"
@@ -202,8 +199,8 @@ class ChatResponse(BaseModel):
     session_id: str
 
 @app.get("/")
-async def serve_frontend():
-    return FileResponse("static/index.html")
+async def root():
+    return {"status": "Backend is running successfully!"}
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
