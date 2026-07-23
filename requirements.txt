@@ -5,5 +5,5 @@ python-dotenv
 pydantic
 langchain
 langchain-core
+langchain-groq
 
-langchain-openai
