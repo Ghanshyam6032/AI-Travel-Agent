@@ -4,7 +4,7 @@ An AI-powered Travel Agent built with **FastAPI**, **LangChain**, and **LangGrap
 
 ## 🚀 Live Demo
 
-🌐 **Live Application:** https://ai-travel-agent-production-f308.up.railway.app/
+🌐 **Live Application:** https://ghanshyam6032.github.io/AI-Travel-Agent/
 
 ---
 
