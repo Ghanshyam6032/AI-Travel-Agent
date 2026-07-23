@@ -93,10 +93,10 @@ app.add_middleware(
 # Mount static folder for CSS/JS/Assets (Serves your HTML Frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ✨ SHIFTED TO OPENROUTER (FREE HIGH LIMITS) ✨
+# ✨ SHIFTED TO OPENROUTER (FREE GOOGLE GEMMA 2 MODEL) ✨
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 llm = ChatOpenAI(
-    model="meta-llama/llama-3.1-8b-instruct:free",
+    model="google/gemma-2-9b-it:free",
     api_key=openrouter_api_key,
     base_url="https://openrouter.ai/api/v1",
     temperature=0
