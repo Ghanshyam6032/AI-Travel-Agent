@@ -42,7 +42,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
         
-        /* MOBILE VIEWPORT FIX: 100dvh use kiya gaya hai taaki mobile browser bottom bar se typing bar na chhipe */
         body, html { 
             height: 100%; 
             height: 100dvh; 
@@ -50,22 +49,41 @@
             background-color: var(--bg-main); 
             color: var(--text-main); 
             overflow: hidden; 
-            position: fixed; 
             transition: background-color 0.3s, color 0.3s; 
         }
 
         .app-container { 
             display: flex; 
-            height: 100vh; 
+            height: 100%;
             height: 100dvh; 
             width: 100vw; 
-            flex-direction: column; 
+            flex-direction: row; 
+            overflow: hidden;
         }
 
-        .sidebar { width: var(--sidebar-width); min-width: var(--sidebar-width); background-color: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; transition: var(--transition); height: 100%; }
-        @media (min-width: 769px) { .sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-width)); } }
+        /* Sidebar Styling */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width); 
+            background-color: var(--bg-card); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100; 
+            transition: var(--transition); 
+            height: 100%; 
+        }
+
+        @media (min-width: 769px) { 
+            .sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-width)); } 
+        }
+
         @media (max-width: 768px) {
-            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+            .sidebar { 
+                position: absolute; 
+                left: 0; top: 0; bottom: 0; 
+                transform: translateX(-100%); 
+            }
             .sidebar.active { transform: translateX(0); }
         }
 
@@ -78,12 +96,33 @@
         .chat-history-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--text-main); border-radius: var(--radius-sm); font-size: 0.85rem; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: var(--transition); }
         .chat-history-item:hover { background-color: var(--border); }
 
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; height: 100%; }
-        .header { height: 60px; min-height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; background-color: var(--bg-main); border-bottom: 1px solid var(--border); z-index: 10; }
+        /* Main Wrapper */
+        .main-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            position: relative; 
+            height: 100%;
+        }
+
+        .header { 
+            height: 60px; 
+            min-height: 60px; 
+            padding: 0 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background-color: var(--bg-main); 
+            border-bottom: 1px solid var(--border); 
+            z-index: 10; 
+        }
+
         .header-left, .header-right { display: flex; align-items: center; gap: 12px; }
         .brand-title { font-weight: 600; font-size: 1.05rem; color: var(--text-main); }
         .icon-btn { background: transparent; border: none; color: var(--text-muted); width: 36px; height: 36px; border-radius: var(--radius-sm); cursor: pointer; font-size: 1.1rem; transition: background-color 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; }
         .icon-btn:hover { background-color: var(--bg-card); color: var(--text-main); }
+        
         #btn-close-sidebar { display: none !important; border: 1px solid var(--border); }
         @media (max-width: 768px) { #btn-close-sidebar { display: flex !important; } }
 
@@ -119,7 +158,7 @@
         .action-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
         .action-btn:hover { color: var(--primary); }
 
-        /* MOBILE INPUT CONTAINER FIX */
+        /* Input Wrapper with Safe Area Support */
         .input-wrapper { 
             padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)); 
             max-width: 800px; 
@@ -138,6 +177,7 @@
         .input-disclaimer { text-align: center; font-size: 0.65rem; color: var(--text-muted); margin-top: 6px; }
         .typing-indicator { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;}
 
+        /* Tools Panel */
         .tools-panel { width: var(--panel-width); background-color: var(--bg-card); border-left: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease; height: 100%; position: absolute; right: 0; top: 0; bottom: 0; z-index: 50; transform: translateX(100%); }
         .tools-panel.active { transform: translateX(0); }
         .panel-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
