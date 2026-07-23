@@ -99,24 +99,7 @@ docker build -t ai-travel-agent .
 docker run -p 8000:8000 --env-file .env ai-travel-agent
 ```
 
----
 
-## 📸 Screenshots
-
-Add screenshots here:
-
-- Home Page
-- Chat Interface
-- AI Travel Planning
-- Mobile View
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
----
 
 ## 👨‍💻 Author
 
