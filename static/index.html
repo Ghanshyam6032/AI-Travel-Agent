@@ -103,10 +103,13 @@
 
         .sidebar-header {
             padding: 16px;
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
         }
 
         .btn-new-chat {
-            width: 100%;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -215,6 +218,18 @@
         .icon-btn:hover {
             background-color: var(--bg-card);
             color: var(--text-main);
+        }
+
+        /* Mobile Sidebar Close Button */
+        #btn-close-sidebar { 
+            display: none !important; 
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            #btn-close-sidebar { 
+                display: flex !important; 
+            }
         }
 
         /* --- Chat Area --- */
@@ -540,6 +555,9 @@
                 <button id="btn-new-chat" class="btn-new-chat">
                     <i class="fa-solid fa-plus"></i> New chat
                 </button>
+                <button id="btn-close-sidebar" class="icon-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
             
             <!-- History section added back -->
@@ -701,6 +719,7 @@
             const heroSection = document.getElementById('hero-section');
             const sidebar = document.getElementById('sidebar');
             const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+            const btnCloseSidebar = document.getElementById('btn-close-sidebar');
             const btnSend = document.getElementById('btn-send');
             const historyList = document.getElementById('chat-history-list');
             
@@ -749,6 +768,12 @@
                 }
             });
 
+            // Close left sidebar (Mobile only)
+            btnCloseSidebar.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+            });
+
+            // Right Tools Toggles
             btnToggleTools.addEventListener('click', () => {
                 toolsPanel.classList.toggle('active');
             });
@@ -795,7 +820,8 @@
                 const loadingId = appendLoadingBubble();
 
                 try {
-                    const response = await fetch('http://127.0.0.1:8000/chat', {
+                    // FIXED: Relative path ensures it works on Localhost, Mobile, and Railway
+                    const response = await fetch('/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -815,7 +841,7 @@
 
                 } catch (error) {
                     removeLoadingBubble(loadingId);
-                    appendBotMessage('⚠️ **Connection Error**: Unable to reach backend. Verify server is running on http://127.0.0.1:8000');
+                    appendBotMessage('⚠️ **Connection Error**: Unable to reach backend. Please try again.');
                 }
             }
 
