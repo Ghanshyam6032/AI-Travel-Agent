@@ -7,9 +7,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List, Optional
+
 from langchain_core.tools import tool
 from langchain.chat_models import init_chat_model
-from langchain.agents import create_agent
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, BaseMessage
+from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 
 # Load environment variables
 load_dotenv()
@@ -152,9 +155,9 @@ def distance_calculator(origin: str, destination: str) -> str:
         return f"Error calculating distance: {str(e)}"
 
 # ---------------------------------------------------------
-# FastAPI & Agent Setup
+# FastAPI & Agent Setup with LangGraph Checkpointer
 # ---------------------------------------------------------
-app = FastAPI(title="AI Travel Agent API", version="1.0")
+app = FastAPI(title="AI Travel Agent API", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -164,8 +167,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Mistral Model via LangChain
-llm = init_chat_model(model="mistral-small-latest", model_provider="mistralai", temperature=0)
+llm = init_chat_model(model="mistral-large-latest", model_provider="mistralai", temperature=0)
 
 tools = [weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator]
 
@@ -186,9 +188,8 @@ system_prompt = (
     "### 💱 Currency Conversion\n"
 )
 
-agent = create_agent(model=llm, tools=tools, system_prompt=system_prompt)
-
-sessions: Dict[str, List[dict]] = {}
+memory = MemorySaver()
+agent = create_react_agent(model=llm, tools=tools, checkpointer=memory, prompt=system_prompt)
 
 class ChatRequest(BaseModel):
     message: str
@@ -206,35 +207,18 @@ async def root():
 async def chat_endpoint(request: ChatRequest):
     try:
         session_id = request.session_id or str(uuid.uuid4())
+        config = {"configurable": {"thread_id": session_id}}
         
-        if session_id not in sessions:
-            sessions[session_id] = []
+        input_message = HumanMessage(content=request.message)
+        
+        result = agent.invoke({"messages": [input_message]}, config)
+        
+        messages = result.get("messages", [])
+        if not messages:
+            raise HTTPException(status_code=500, detail="No response generated from agent.")
             
-        sessions[session_id].append({"role": "user", "content": request.message})
-        
-        # Memory Management - Keep only last 4 messages to save tokens
-        if len(sessions[session_id]) > 4:
-            sessions[session_id] = sessions[session_id][-4:]
-            
-        result = agent.invoke({"messages": sessions[session_id]})
-        
-        # Extract messages properly handling LangChain objects and dicts
-        cleaned_messages = []
-        for msg in result["messages"]:
-            if hasattr(msg, "type") and hasattr(msg, "content"):
-                # Convert LangChain message object to standard dict format
-                role = "assistant" if msg.type == "ai" else msg.type
-                if role == "tool":
-                    role = "tool"
-                cleaned_messages.append({"role": role, "content": msg.content})
-            elif isinstance(msg, dict):
-                cleaned_messages.append(msg)
-                
-        sessions[session_id] = cleaned_messages
-        
-        # Safely get the last message content
-        last_msg = sessions[session_id][-1]
-        ai_reply = last_msg.get("content") if isinstance(last_msg, dict) else getattr(last_msg, "content", str(last_msg))
+        last_msg = messages[-1]
+        ai_reply = last_msg.content if hasattr(last_msg, "content") else str(last_msg)
         
         return ChatResponse(reply=ai_reply, session_id=session_id)
         
