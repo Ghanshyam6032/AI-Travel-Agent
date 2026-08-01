@@ -1,9 +1,10 @@
 fastapi
 uvicorn
-requests
 python-dotenv
-pydantic
+requests
+
 langchain
 langchain-core
-langchain-groq
+langgraph
+
 langchain-mistralai
