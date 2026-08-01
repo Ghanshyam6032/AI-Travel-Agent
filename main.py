@@ -165,7 +165,7 @@ app.add_middleware(
 )
 
 # Initialize Mistral Model via LangChain
-llm = init_chat_model(model="mistral-large-latest", model_provider="mistralai", temperature=0)
+llm = init_chat_model(model="mistral-small-latest", model_provider="mistralai", temperature=0)
 
 tools = [weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator]
 
