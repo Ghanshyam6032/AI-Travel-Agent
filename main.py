@@ -212,11 +212,20 @@ async def chat_endpoint(request: ChatRequest):
             
         sessions[session_id].append({"role": "user", "content": request.message})
         
+        # Memory Management - Keep only last 4 messages to save tokens
         if len(sessions[session_id]) > 4:
             sessions[session_id] = sessions[session_id][-4:]
             
         result = agent.invoke({"messages": sessions[session_id]})
-        sessions[session_id] = result["messages"]
+        
+        # Clean and fix message roles sequence for Mistral API compatibility
+        cleaned_messages = []
+        for msg in result["messages"]:
+            # LangChain messages ko dict ya standard format me convert karte waqt role check karein
+            msg_dict = msg.dict() if hasattr(msg, "dict") else dict(msg)
+            cleaned_messages.append(msg_dict)
+            
+        sessions[session_id] = cleaned_messages
         ai_reply = sessions[session_id][-1].content
         
         return ChatResponse(reply=ai_reply, session_id=session_id)
