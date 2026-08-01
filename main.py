@@ -218,15 +218,23 @@ async def chat_endpoint(request: ChatRequest):
             
         result = agent.invoke({"messages": sessions[session_id]})
         
-        # Clean and fix message roles sequence for Mistral API compatibility
+        # Extract messages properly handling LangChain objects and dicts
         cleaned_messages = []
         for msg in result["messages"]:
-            # LangChain messages ko dict ya standard format me convert karte waqt role check karein
-            msg_dict = msg.dict() if hasattr(msg, "dict") else dict(msg)
-            cleaned_messages.append(msg_dict)
-            
+            if hasattr(msg, "type") and hasattr(msg, "content"):
+                # Convert LangChain message object to standard dict format
+                role = "assistant" if msg.type == "ai" else msg.type
+                if role == "tool":
+                    role = "tool"
+                cleaned_messages.append({"role": role, "content": msg.content})
+            elif isinstance(msg, dict):
+                cleaned_messages.append(msg)
+                
         sessions[session_id] = cleaned_messages
-        ai_reply = sessions[session_id][-1].content
+        
+        # Safely get the last message content
+        last_msg = sessions[session_id][-1]
+        ai_reply = last_msg.get("content") if isinstance(last_msg, dict) else getattr(last_msg, "content", str(last_msg))
         
         return ChatResponse(reply=ai_reply, session_id=session_id)
         
