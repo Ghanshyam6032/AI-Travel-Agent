@@ -156,16 +156,16 @@ def distance_calculator(origin: str, destination: str) -> str:
 # ---------------------------------------------------------
 app = FastAPI(title="AI Travel Agent API", version="1.0")
 
-# CORS setup taaki GitHub Pages se requests allow ho sakein
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Production me aap yahan apna GitHub Pages URL dal sakte hain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-llm = init_chat_model(model="llama-3.3-70b-versatile", model_provider="groq", temperature=0)
+# Initialize Mistral Model via LangChain
+llm = init_chat_model(model="mistral-large-latest", model_provider="mistralai", temperature=0)
 
 tools = [weather, flight_search, hotel_search, currency_converter, restaurant_search, distance_calculator]
 
@@ -212,7 +212,6 @@ async def chat_endpoint(request: ChatRequest):
             
         sessions[session_id].append({"role": "user", "content": request.message})
         
-        # Memory Management - Keep only last 4 messages to save tokens
         if len(sessions[session_id]) > 4:
             sessions[session_id] = sessions[session_id][-4:]
             
