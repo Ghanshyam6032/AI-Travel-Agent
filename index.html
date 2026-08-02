@@ -469,8 +469,8 @@
                 stopBtnContainer.classList.remove('hidden');
 
                 try {
-                    // Yahan par naya Vercel proxy wala URL daala hai
-                    const BACKEND_URL = '/api/chat';
+                    // Seedha Railway backend ka URL daal diya hai taaki GitHub Pages par bhi chale
+                    const BACKEND_URL = 'https://ai-travel-agent-production-d74c.up.railway.app/chat';
 
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
