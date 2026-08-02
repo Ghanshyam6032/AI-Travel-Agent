@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/chat",
-      "destination": "https://ai-travel-agent-production-ead7.up.railway.app/chat"
+      "destination": "https://ai-travel-agent-production-d74c.up.railway.app/chat"
     }
   ]
 }
