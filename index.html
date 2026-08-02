@@ -469,8 +469,8 @@
                 stopBtnContainer.classList.remove('hidden');
 
                 try {
-                    // Yahan par apna Railway backend ka URL daalein
-                    const BACKEND_URL = 'https://ai-travel-agent-production-ead7.up.railway.app/chat';
+                    // Yahan par naya Vercel proxy wala URL daala hai
+                    const BACKEND_URL = '/api/chat';
 
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
