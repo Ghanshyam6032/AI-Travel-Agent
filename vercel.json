@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "https://ai-travel-agent-production-ead7.up.railway.app/chat"
+    }
+  ]
+}
