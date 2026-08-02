@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List, Optional
+import uvicorn
 
 from langchain_core.tools import tool
 from langchain.chat_models import init_chat_model
@@ -236,3 +237,12 @@ async def chat_endpoint(request: ChatRequest):
         print(f"🔥 ERROR: {str(e)}")
         print("="*50 + "\n")
         raise HTTPException(status_code=500, detail=str(e))
+
+# ---------------------------------------------------------
+# DYNAMIC PORT FIX FOR RAILWAY
+# ---------------------------------------------------------
+if __name__ == "__main__":
+    # Railway jo port provide karega wo lenge, warn default 8080 use hoga
+    port = int(os.environ.get("PORT", 8080))
+    # 'app' ko directly pass kar rahe hain taaki kisi bhi file name ke saath chal jaye
+    uvicorn.run(app, host="0.0.0.0", port=port)
